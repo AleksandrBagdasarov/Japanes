@@ -9,16 +9,40 @@ from contants import *
 
 
 def get_cities():
-    r = requests.get(DOMAIN)
-    tree = Selector(r.text)
+    req = requests.get(DOMAIN)
 
-    cities = tree.xpath(XPATH_TO_CITIES)
-    cities_name = cities.xpath('./text()').extract()
-    cities_href = cities.xpath('./@href').extract()
+    tree = Selector(req.text)
+    cities_name = tree.xpath(f'{XPATH_TO_CITIES}/text()').extract()
+    cities_href = tree.xpath(f'{XPATH_TO_CITIES}/@href').extract()
+
     for x, y in zip(cities_name, cities_href):
         print(x, y)
     
     # extract_cards(links)
+
+def get_lines():
+    city = '/hokkaido/'
+    req = requests.get(LINK_TO_LINES.format(city))
+
+    tree = Selector(req.text)
+    lines_name = tree.xpath(f'{XPATH_TO_LINES}/text()').extract()
+    lines_href = tree.xpath(f'{XPATH_TO_LINES}/@href').extract()
+
+    for n, h in zip(lines_name, lines_href):
+        print(n, h)
+
+
+
+def get_stations():
+    line = 'hokkaido/chitose-line'
+    req = requests.get(urljoin(DOMAIN, line))
+
+    tree = Selector(req.text)
+    stations_name = tree.xpath(f'{XPATH_TO_STATIONS}/text()').extract()
+    stations_href = tree.xpath(f'{XPATH_TO_STATIONS}/@href').extract()
+
+    for n, h in zip(stations_name, stations_href):
+        print(n, h.split('/')[2].split('-')[0])
 
 
 def extract_cards(station: str):
@@ -52,3 +76,4 @@ def get_dicts():
 if __name__ == "__main__":
     # get_cities()
     # extract_cards()
+    get_stations()

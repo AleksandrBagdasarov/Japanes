@@ -8,16 +8,3 @@ XPATH_TO_STATIONS = "//li[@class='c-lineCheckGroup__item']//a"
 
 A = []
 
-CITIES = {
-    '北海道': '/hokkaido/',
-    '青森': '/aomori/',
-    '岩手': '',
-    '宮城': '/miyagi/'
-}
-
-STATIONS = {
-    '旭川': 'asahikawa_00085',
-    '麻生': 'asabu_06551',
-    '岡山': 'okayama_00029'
-}
-
