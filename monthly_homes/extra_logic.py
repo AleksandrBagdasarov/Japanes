@@ -47,4 +47,4 @@ def get_rooms_info(response):
         A.append(Dict.get_room_parameters(price, usage_fee, initial_cost, name,
                     floor_plan, area, capacity, address))
 
-        return A
+    return A
