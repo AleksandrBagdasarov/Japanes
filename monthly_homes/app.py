@@ -46,20 +46,21 @@ class MonthlyHomes:
 
 
 
-# STATIONS = '/hokkaido/sapporo_00002-st/list', '/hokkaido/chitose_00078-st/list', '/ishikawa/kanazawa_00186-st/list'
+STATIONS = '/hokkaido/sapporo_00002-st/list', '/hokkaido/chitose_00078-st/list', '/ishikawa/kanazawa_00186-st/list', '/aichi/nagoya_00005-st/list', '/okinawa/nahakuko_09840-st/list', '/okinawa/miebashi_09847-st/list'
 
 
-# if __name__ == "__main__":
-#     with open('test.csv', 'w', newline='') as f:
-#         fieldnames = ['link','Price per month', 'Usage fee', 'Initial cost', 'Name of listing', 'Floor plan', 'Occupied area (size)', 'Capacity', 'Address']
-#         writer = csv.DictWriter(f, fieldnames=fieldnames)
-#         writer.writeheader()
-
-#         for station in STATIONS:
-#             writer.writerow({'link': 0,'Price per month': 0, 'Usage fee': 0, 'Initial cost': 0, 'Name of listing': 0, 'Floor plan': 0, 'Occupied area (size)': 0, 'Capacity': 0, 'Address': 0})
-#             for x in MonthlyHomes.extract_station(station):
-#                 writer.writerow(x)
+if __name__ == "__main__":
+    with open('test.csv', 'w', newline='') as f:
+        fieldnames = ['link','Price per month', 'Usage fee', 'Initial cost', 'Name of listing', 'Floor plan', 'Occupied area (size)', 'Capacity', 'Address']
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
 
 
-                # print(x)
-                # print('-- -- ' * 10)
+        for station in STATIONS:
+            writer.writerow({'link': urljoin(DOMAIN, station),'Price per month': 0, 'Usage fee': 0, 'Initial cost': 0, 'Name of listing': 0, 'Floor plan': 0, 'Occupied area (size)': 0, 'Capacity': 0, 'Address': 0})
+            for x in MonthlyHomes.extract_station(station):
+                writer.writerow(x)
+
+
+                print(x)
+                print('-- -- ' * 10)

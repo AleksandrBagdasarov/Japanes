@@ -35,9 +35,9 @@ class Text:
 def get_rooms_info(response):
     A = []
     for r in response:
-        price = r.get('price_30d')
-        usage_fee = price / 30
-        initial_cost = r.get('price_30d_initial_cost') - price
+        price = '%.3f' % (r.get('price_30d') / 1000)
+        usage_fee = '%.3f' % (r.get('price_30d') / 1000 / 30)
+        initial_cost = '%.3f' % ((r.get('price_30d_initial_cost') - r.get('price_30d')) / 1000)
         name = r.get('name')
         floor_plan = r.get('floor_plan_text')
         area = r.get('exclusive_area')
