@@ -8,44 +8,39 @@ from contants import *
 
 
 
-def get_cities():
+def get_cities() -> dict: 
     req = requests.get(DOMAIN)
 
     tree = Selector(req.text)
-    cities_name = tree.xpath(f'{XPATH_TO_CITIES}/text()').extract()
-    cities_href = tree.xpath(f'{XPATH_TO_CITIES}/@href').extract()
+    return Dict.name_link(tree,XPATH_TO_CITIES)
 
-    for x, y in zip(cities_name, cities_href):
-        print(x, y)
-    
-    # extract_cards(links)
 
-def get_lines():
-    city = '/hokkaido/'
+def get_lines(city: str) -> dict:
+    # city = '/hokkaido/'
     req = requests.get(LINK_TO_LINES.format(city))
 
     tree = Selector(req.text)
-    lines_name = tree.xpath(f'{XPATH_TO_LINES}/text()').extract()
-    lines_href = tree.xpath(f'{XPATH_TO_LINES}/@href').extract()
-
-    for n, h in zip(lines_name, lines_href):
-        print(n, h)
+    return Dict.name_link(tree,XPATH_TO_LINES)
 
 
 
-def get_stations():
-    line = 'hokkaido/chitose-line'
+def get_stations(line: str) -> dict:
+    # line = 'hokkaido/chitose-line'
     req = requests.get(urljoin(DOMAIN, line))
 
     tree = Selector(req.text)
-    stations_name = tree.xpath(f'{XPATH_TO_STATIONS}/text()').extract()
-    stations_href = tree.xpath(f'{XPATH_TO_STATIONS}/@href').extract()
 
-    for n, h in zip(stations_name, stations_href):
-        print(n, h.split('/')[2].split('-')[0])
+    tree = Selector(req.text)
+    return Dict.name_link(tree,XPATH_TO_STATIONS)
+
+    # stations_name = tree.xpath(f'{XPATH_TO_STATIONS}/text()').extract()
+    # stations_href = tree.xpath(f'{XPATH_TO_STATIONS}/@href').extract()
+
+    # for n, h in zip(stations_name, stations_href):
+    #     print(n, h.split('/')[2].split('-')[0])
 
 
-def extract_cards(station: str):
+def extract_station(station: str) -> dict:
     
     # station = 'sapporo_00002'
     req = requests.get(JSON_BY_STATION.format(station))
@@ -74,6 +69,6 @@ def get_dicts():
             print(y, z)
 
 if __name__ == "__main__":
-    # get_cities()
-    # extract_cards()
-    get_stations()
+    get_cities()
+    # extract_station()
+    # get_stations()

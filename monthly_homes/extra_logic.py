@@ -15,3 +15,18 @@ class Dict:
             'Capacity': capacity,
             'Address': address,            
         }
+
+    @staticmethod
+    def name_link(tree, xpath):
+
+        name = tree.xpath(f'{xpath}/text()').extract()
+        link = tree.xpath(f'{xpath}/@href').extract()
+
+        return [{'name': n, 'link': l} for n, l in zip(name, link)]
+
+
+class Text:
+
+    @staticmethod
+    def extract_station(link: str) -> str:
+        return link.split('/')[2].split('-')[0]
