@@ -1,11 +1,13 @@
-
+from urllib.parse import urljoin
+from const import LINK_TO_CARD
 
 class Dict:
 
     @staticmethod
-    def get_room_parameters(price: str, usage_fee: str, initial_cost: str, name: str,
+    def get_room_parameters(link: str, price: str, usage_fee: str, initial_cost: str, name: str,
              floor_plan: str, area: str, capacity: str, adress: str):
         return {
+            'link': link,
             'Price per month': price,
             'Usage fee': usage_fee,
             'Initial cost': initial_cost,
@@ -35,6 +37,7 @@ class Text:
 def get_rooms_info(response):
     A = []
     for r in response:
+        link = LINK_TO_CARD.format(r.get('id'))
         price = r.get('price_30d')
         usage_fee = r.get('price_30d')
         initial_cost = r.get('price_30d_initial_cost') - price
@@ -44,7 +47,7 @@ def get_rooms_info(response):
         capacity = r.get('capacity')
         adress = r.get('building').get('full_address')
 
-        A.append(Dict.get_room_parameters(price, usage_fee, initial_cost, name,
+        A.append(Dict.get_room_parameters(link, price, usage_fee, initial_cost, name,
                     floor_plan, area, capacity, adress))
 
     return A

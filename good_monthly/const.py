@@ -7,6 +7,9 @@ XPATH_TO_LINES_AND_STATIONS = "//li/label/a"
 XPATH_TO_PRICE_INFO = "//*[contains(text(), '(1ヶ月以上～3ヶ月未満)')]"
 XPATH_TO_PRICE_LIST = "//*[contains(text(), '(1ヶ月以上～3ヶ月未満)')]/parent::th/parent::tr/td/text()"
 XPATH_TO_PRICE_LIST_ALTERNATIVE = "//th[@class='th03']/parent::tr/td/text()"
+XPATH_TO_PRICE_INFO_2 = "//*[contains(text(), '1ヶ月以上')]"
+XPATH_TO_PRICE_LIST_ALTERNATIVE_2 = "//*[contains(text(), '1ヶ月以上')]/parent::tr/td/text()"
+
 
 
 

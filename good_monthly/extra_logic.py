@@ -62,33 +62,48 @@ class Rqst:
         return links
 
     @staticmethod
-    def extract_cards(link: str) -> list:
+    def extract_card(link: str) -> list:
         req = requests.get(link)
         if req.status_code == 200:
             tree = Selector(req.text)
             
             if tree.xpath(XPATH_TO_PRICE_INFO).extract():
+                print(link)
                 for month_price, usg_fee, init_cost in [tree.xpath(XPATH_TO_PRICE_LIST).extract()]:
                     price = Text.get_price(Text.get_string(month_price))
                     usage_fee = Text.get_price(Text.get_string(usg_fee))
                     initial_cost = Text.get_price(Text.get_string(init_cost))
-            else:
-                for month_price, usg_fee, init_cost in [tree.xpath(XPATH_TO_PRICE_LIST_ALTERNATIVE).extract()]:
+
+            elif tree.xpath(XPATH_TO_PRICE_INFO_2).extract():
+                print(link)
+                for month_price, init_cost, usg_fee in [tree.xpath(XPATH_TO_PRICE_LIST_ALTERNATIVE_2).extract()]:
                     price = Text.get_price(Text.get_string(month_price))
                     usage_fee = Text.get_price(Text.get_string(usg_fee))
                     initial_cost = Text.get_price(Text.get_string(init_cost))
 
-            name = Text.get_string(tree.xpath("//h2/text()").extract())
+            else:
+                print(link)
+                for month_price, init_cost, usg_fee in [tree.xpath(XPATH_TO_PRICE_LIST_ALTERNATIVE).extract()]:
+                    price = Text.get_price(Text.get_string(month_price))
+                    usage_fee = Text.get_price(Text.get_string(usg_fee))
+                    initial_cost = Text.get_price(Text.get_string(init_cost))
+
+            name = tree.xpath("//h2/text()").extract()
             floor_plan = Text.get_string(tree.xpath("//dt[contains(text(), '間取り')]/following-sibling::dd/text()").extract())
             area = Text.extract_area(tree.xpath("//dt[contains(text(), '面積')]/following-sibling::dd/text()").extract_first())
             capacity = Text.get_digits(tree.xpath("//dt[contains(text(), '定員人数')]/following-sibling::dd/text()").extract_first())
-            adress = Text.get_string(tree.xpath("//p[@class='mapLink']/parent::dd/text()").extract())
+            adress = tree.xpath("//*[contains(text(), '所在地')]/following-sibling::*/text()").extract_first()
 
         return Dict.get_room_parameters(link, price, usage_fee, initial_cost, name,
              floor_plan, area, capacity, adress)
 
 
 class Text:
+
+    @staticmethod
+    def get_name(some_list: list) -> str:
+        if some_list:
+            return ''.join(some_list)
 
     @staticmethod
     def get_string(some_list: list) -> str:
