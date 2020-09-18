@@ -12,27 +12,26 @@ class MonthlyHomes:
     @staticmethod
     def get_cities() -> dict: 
         req = requests.get(DOMAIN)
-
-        tree = Selector(req.text)
-        return Dict.name_link(tree,XPATH_TO_CITIES)
+        if req.status_code == 200:
+            tree = Selector(req.text)
+            return Dict.name_link(tree,XPATH_TO_CITIES)
 
     @staticmethod
     def get_lines(city: str) -> dict:
         # city = '/hokkaido/'
         req = requests.get(LINK_TO_LINES.format(city))
-
-        tree = Selector(req.text)
-        return Dict.name_link(tree,XPATH_TO_LINES)
+        if req.status_code == 200:
+            tree = Selector(req.text)
+            return Dict.name_link(tree,XPATH_TO_LINES)
 
     @staticmethod
     def get_stations(line: str) -> dict:
         # line = 'hokkaido/chitose-line'
         req = requests.get(urljoin(DOMAIN, line))
 
-        tree = Selector(req.text)
-
-        tree = Selector(req.text)
-        return Dict.name_link(tree,XPATH_TO_STATIONS)
+        if req.status_code == 200:
+            tree = Selector(req.text)
+            return Dict.name_link(tree,XPATH_TO_STATIONS)
 
     @staticmethod
     def extract_station(station: str) -> list:
@@ -40,8 +39,9 @@ class MonthlyHomes:
         # "/hokkaido/chitose_00078-st/list" -> "/chitose_00078-st/"
 
         req = requests.get(JSON_BY_STATION.format(station))
-        response = json.loads(req.text)
-        return get_rooms_info(response)
+        if req.status_code == 200:
+            response = json.loads(req.text)
+            return get_rooms_info(response)
 
 
 
