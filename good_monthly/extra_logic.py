@@ -1,8 +1,10 @@
 from urllib.parse import urljoin
-from const import *
+
 import requests
 from parsel import Selector
-from urllib.parse import urljoin
+
+from const import *
+
 
 class Dict:
     
@@ -69,7 +71,7 @@ class Rqst:
             
             if tree.xpath(XPATH_TO_PRICE_INFO).extract():
                 print(link)
-                for month_price, usg_fee, init_cost in [tree.xpath(XPATH_TO_PRICE_LIST).extract()]:
+                for month_price, init_cost, usg_fee in [tree.xpath(XPATH_TO_PRICE_LIST).extract()]:
                     price = Text.get_price(Text.get_string(month_price))
                     usage_fee = Text.get_price(Text.get_string(usg_fee))
                     initial_cost = Text.get_price(Text.get_string(init_cost))
@@ -88,7 +90,7 @@ class Rqst:
                     usage_fee = Text.get_price(Text.get_string(usg_fee))
                     initial_cost = Text.get_price(Text.get_string(init_cost))
 
-            name = tree.xpath("//h2/text()").extract()
+            name = Text.get_string(tree.xpath("//h2/text()").extract())
             floor_plan = Text.get_string(tree.xpath("//dt[contains(text(), '間取り')]/following-sibling::dd/text()").extract())
             area = Text.extract_area(tree.xpath("//dt[contains(text(), '面積')]/following-sibling::dd/text()").extract_first())
             capacity = Text.get_digits(tree.xpath("//dt[contains(text(), '定員人数')]/following-sibling::dd/text()").extract_first())
@@ -99,11 +101,6 @@ class Rqst:
 
 
 class Text:
-
-    @staticmethod
-    def get_name(some_list: list) -> str:
-        if some_list:
-            return ''.join(some_list)
 
     @staticmethod
     def get_string(some_list: list) -> str:

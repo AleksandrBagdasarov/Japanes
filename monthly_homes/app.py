@@ -1,11 +1,13 @@
+import csv
+import json
+from urllib.parse import urljoin
+
 import requests
 from parsel import Selector
-from urllib.parse import urljoin
-import json
-from extra_logic import *
-from const import *
 
-import csv
+from const import *
+from extra_logic import *
+
 
 class MonthlyHomes:
 
