@@ -7,9 +7,10 @@ from urllib.parse import urljoin
 class Dict:
     
     @staticmethod
-    def get_room_parameters(price: str, usage_fee: str, initial_cost: str, name: str,
-             floor_plan: str, area: str, capacity: str, address: str):
+    def get_room_parameters(link: str,price: str, usage_fee: str, initial_cost: str, name: str,
+             floor_plan: str, area: str, capacity: str, adress: str):
         return {
+            'link': link,
             'Price per month': price,
             'Usage fee': usage_fee,
             'Initial cost': initial_cost,
@@ -17,7 +18,7 @@ class Dict:
             'Floor plan': floor_plan,
             'Occupied area (size)': area,
             'Capacity': capacity,
-            'Address': address,            
+            'Address': adress,            
         }
 
     @staticmethod
@@ -41,30 +42,23 @@ class Rqst:
 
     @staticmethod
     def get_cards(station: str) -> list:
-        # station = 'https://www.good-monthly.com/search/list_eki.html?rosen_eki_cd=523|9236'
-        links = []
-        page = 1
         def cheker(urls, page):
             if urls:
                 page += 1
                 reqst(page)
 
-        def reqst(page):
-            
+        def reqst(page):            
             req = requests.request("POST", station, headers=HEADERS, data = PAYLOAD_PAGE.format(page))
-
             if req.status_code == 200:
                 tree = Selector(req.text)
                 urls = tree.xpath("//h3/a/@href").extract()
-
                 for url in urls:
                     links.append(urljoin(DOMAIN, url))
-
             cheker(urls, page)
-
-
-        reqst(page)
         
+        links = []
+        page = 1
+        reqst(page)        
         return links
 
     @staticmethod
@@ -72,16 +66,27 @@ class Rqst:
         req = requests.get(link)
         if req.status_code == 200:
             tree = Selector(req.text)
+            
+            if tree.xpath(XPATH_TO_PRICE_INFO).extract():
+                for month_price, usg_fee, init_cost in [tree.xpath(XPATH_TO_PRICE_LIST).extract()]:
+                    price = Text.get_price(Text.get_string(month_price))
+                    usage_fee = Text.get_price(Text.get_string(usg_fee))
+                    initial_cost = Text.get_price(Text.get_string(init_cost))
+            else:
+                for month_price, usg_fee, init_cost in [tree.xpath(XPATH_TO_PRICE_LIST_ALTERNATIVE).extract()]:
+                    price = Text.get_price(Text.get_string(month_price))
+                    usage_fee = Text.get_price(Text.get_string(usg_fee))
+                    initial_cost = Text.get_price(Text.get_string(init_cost))
 
-            adress = Text.get_string(tree.xpath("//p[@class='mapLink']/parent::dd/text()").extract())
             name = Text.get_string(tree.xpath("//h2/text()").extract())
+            floor_plan = Text.get_string(tree.xpath("//dt[contains(text(), '間取り')]/following-sibling::dd/text()").extract())
             area = Text.extract_area(tree.xpath("//dt[contains(text(), '面積')]/following-sibling::dd/text()").extract_first())
+            capacity = Text.get_digits(tree.xpath("//dt[contains(text(), '定員人数')]/following-sibling::dd/text()").extract_first())
             adress = Text.get_string(tree.xpath("//p[@class='mapLink']/parent::dd/text()").extract())
-            adress = Text.get_string(tree.xpath("//p[@class='mapLink']/parent::dd/text()").extract())
-            adress = Text.get_string(tree.xpath("//p[@class='mapLink']/parent::dd/text()").extract())
-            adress = Text.get_string(tree.xpath("//p[@class='mapLink']/parent::dd/text()").extract())
-            adress = Text.get_string(tree.xpath("//p[@class='mapLink']/parent::dd/text()").extract())
-    
+
+        return Dict.get_room_parameters(link, price, usage_fee, initial_cost, name,
+             floor_plan, area, capacity, adress)
+
 
 class Text:
 
@@ -93,7 +98,18 @@ class Text:
     @staticmethod
     def extract_area(some_str: str) -> str:
         if some_str:
-            return some_str.replace('m²', '')
-    # def get_digits(some_str: str) -> str:
-    #     if some_str:
-    #         return ''.join([x for x in some_str if x.isdigit()])
+            return ''.join([x for x in some_str if x.isdigit() or x == '.']).replace('²', '')
+    
+    @staticmethod
+    def get_digits(some_str: str) -> str:
+        if some_str:
+            n = ''.join([x for x in some_str if x.isdigit()])
+            if n:
+                return int(n)
+            else:
+                return 0
+
+    @staticmethod
+    def get_price(some_str: str) -> list:
+        if some_str:
+            return max([Text.get_digits(x) for x in some_str.split('/')]) or 0

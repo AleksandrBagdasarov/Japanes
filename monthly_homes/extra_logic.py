@@ -4,7 +4,7 @@ class Dict:
 
     @staticmethod
     def get_room_parameters(price: str, usage_fee: str, initial_cost: str, name: str,
-             floor_plan: str, area: str, capacity: str, address: str):
+             floor_plan: str, area: str, capacity: str, adress: str):
         return {
             'Price per month': price,
             'Usage fee': usage_fee,
@@ -13,7 +13,7 @@ class Dict:
             'Floor plan': floor_plan,
             'Occupied area (size)': area,
             'Capacity': capacity,
-            'Address': address,            
+            'Adress': adress,            
         }
 
     @staticmethod
@@ -35,16 +35,16 @@ class Text:
 def get_rooms_info(response):
     A = []
     for r in response:
-        price = '%.3f' % (r.get('price_30d') / 1000)
-        usage_fee = '%.3f' % (r.get('price_30d') / 1000 / 30)
-        initial_cost = '%.3f' % ((r.get('price_30d_initial_cost') - r.get('price_30d')) / 1000)
+        price = r.get('price_30d')
+        usage_fee = r.get('price_30d')
+        initial_cost = r.get('price_30d_initial_cost') - price
         name = r.get('name')
         floor_plan = r.get('floor_plan_text')
         area = r.get('exclusive_area')
         capacity = r.get('capacity')
-        address = r.get('building').get('full_address')
+        adress = r.get('building').get('full_address')
 
         A.append(Dict.get_room_parameters(price, usage_fee, initial_cost, name,
-                    floor_plan, area, capacity, address))
+                    floor_plan, area, capacity, adress))
 
     return A

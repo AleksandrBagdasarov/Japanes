@@ -46,7 +46,7 @@ class MonthlyHomes:
 
 
 
-STATIONS = '/hokkaido/sapporo_00002-st/list', '/hokkaido/chitose_00078-st/list', '/ishikawa/kanazawa_00186-st/list', '/aichi/nagoya_00005-st/list', '/okinawa/nahakuko_09840-st/list', '/okinawa/miebashi_09847-st/list'
+
 
 
 if __name__ == "__main__":
@@ -55,8 +55,8 @@ if __name__ == "__main__":
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
 
-
-        for station in STATIONS:
+        stations = '/hokkaido/sapporo_00002-st/list', '/hokkaido/chitose_00078-st/list', '/ishikawa/kanazawa_00186-st/list', '/aichi/nagoya_00005-st/list', '/okinawa/nahakuko_09840-st/list', '/okinawa/miebashi_09847-st/list'
+        for station in stations:
             writer.writerow({'link': urljoin(DOMAIN, station),'Price per month': 0, 'Usage fee': 0, 'Initial cost': 0, 'Name of listing': 0, 'Floor plan': 0, 'Occupied area (size)': 0, 'Capacity': 0, 'Address': 0})
             for x in MonthlyHomes.extract_station(station):
                 writer.writerow(x)
