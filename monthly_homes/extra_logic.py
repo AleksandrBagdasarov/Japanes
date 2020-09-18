@@ -1,5 +1,7 @@
 from urllib.parse import urljoin
+
 from const import LINK_TO_CARD
+
 
 class Dict:
 
