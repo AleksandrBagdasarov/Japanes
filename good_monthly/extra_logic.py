@@ -3,14 +3,13 @@ from urllib.parse import urljoin
 import requests
 from parsel import Selector
 
-from const import *
-
+from .const import *
 
 class Dict:
     
     @staticmethod
     def get_room_parameters(link: str,price: str, usage_fee: str, initial_cost: str, name: str,
-             floor_plan: str, area: str, capacity: str, adress: str):
+             floor_plan: str, area: str, capacity: str, adress: str, construction_date: str):
         return {
             'link': link,
             'Price per month': price,
@@ -20,7 +19,8 @@ class Dict:
             'Floor plan': floor_plan,
             'Occupied area (size)': area,
             'Capacity': capacity,
-            'Address': adress,            
+            'Address': adress,
+            'Construction date': construction_date,         
         }
 
     @staticmethod
@@ -29,7 +29,8 @@ class Dict:
         name = tree.xpath(f'{xpath}/@alt').extract()
         link = tree.xpath(f'{xpath}/parent::a/parent::li/@id').extract()
 
-        return [{'name': n, 'link': LINK_TO_LINES.format(l)} for n, l in zip(name, link)]
+        # return [{'name': n, 'link': LINK_TO_LINES.format(l)} for n, l in zip(name, link)]
+        return {n: LINK_TO_LINES.format(l) for n, l in zip(name, link)}
     
     @staticmethod
     def get_name_link(tree, xpath=XPATH_TO_LINES_AND_STATIONS):
@@ -49,8 +50,8 @@ class Rqst:
                 page += 1
                 reqst(page)
 
-        def reqst(page):            
-            req = requests.request("POST", station, headers=HEADERS, data = PAYLOAD_PAGE.format(page))
+        def reqst(page):
+            req = requests.request("POST", station, headers=HEADERS, data=PAYLOAD_PAGE.format(page))
             if req.status_code == 200:
                 tree = Selector(req.text)
                 urls = tree.xpath("//h3/a/@href").extract()
@@ -94,10 +95,11 @@ class Rqst:
             floor_plan = Text.get_string(tree.xpath("//dt[contains(text(), '間取り')]/following-sibling::dd/text()").extract())
             area = Text.extract_area(tree.xpath("//dt[contains(text(), '面積')]/following-sibling::dd/text()").extract_first())
             capacity = Text.get_digits(tree.xpath("//dt[contains(text(), '定員人数')]/following-sibling::dd/text()").extract_first())
-            adress = tree.xpath("//*[contains(text(), '所在地')]/following-sibling::*/text()").extract_first()
+            adress = Text.get_string(tree.xpath("//*[contains(text(), '所在地')]/following-sibling::*/text()").extract())
+            construction_date = Text.get_string(tree.xpath("//dt[contains(text(), '築年月')]/following-sibling::dd/text()").extract())
 
         return Dict.get_room_parameters(link, price, usage_fee, initial_cost, name,
-             floor_plan, area, capacity, adress)
+             floor_plan, area, capacity, adress, construction_date)
 
 
 class Text:
