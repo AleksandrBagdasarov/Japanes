@@ -9,30 +9,49 @@ from core.logger import logger
 
 
 def get_cities() -> list:
-    req = requests.get(DOMAIN)
-    if req.status_code == 200:
-        logger.debug(f'{req.status_code} {DOMAIN}')
-        tree = Selector(req.text)
+    response = requests.get(DOMAIN)
+    try:
+        assert response.status_code == 200
+
+        logger.debug(f'[code:{response.status_code}] {response.url}')
+
+        tree = Selector(response.text)
         return Dict.get_name_link_city(tree, XPATH_TO_CITIES)
+
+    except AssertionError:
+        logger.exception(f'{response.status_code} {response.url}')
 
 
 def get_lines(city: str) -> list:
     # city = 'https://www.good-monthly.com/okinawa/search/select_line.html'
     
-    req = requests.get(city)
-    if req.status_code == 200:
-        tree = Selector(req.text)
+    response = requests.get(city)
+    try:
+        assert response.status_code == 200
+
+        logger.debug(f'[code:{response.status_code}] {response.url}')
+
+        tree = Selector(response.text)
         return Dict.get_name_link(tree)
+
+    except AssertionError:
+        logger.exception(f'{response.status_code} {response.url}')
 
 
 def get_stations(line: str) -> list:
     # line = 'https://www.good-monthly.com/search/select_station.html?rosen_cd=523'
     
-    req = requests.get(line)
-    if req.status_code == 200:
-        tree = Selector(req.text)
+    response = requests.get(line)
+    try:
+        assert response.status_code == 200
+
+        logger.debug(f'[code:{response.status_code}] {response.url}')
+
+        tree = Selector(response.text)
         return Dict.get_name_link(tree)
 
+    except AssertionError:
+        logger.exception(f'{response.status_code} {response.url}')
 
 
 def extract_station(station: str) -> list:

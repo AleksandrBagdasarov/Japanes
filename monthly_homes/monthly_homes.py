@@ -12,40 +12,65 @@ from core.logger import logger
 
 
 def get_cities() -> dict: 
-    req = requests.get(DOMAIN)
-    if req.status_code == 200:
-        logger.debug(f'{req.status_code} {DOMAIN}')
-        tree = Selector(req.text)
+    response = requests.get(DOMAIN)
+    try:
+        assert response.status_code == 200
+        
+        logger.debug(f'[code:{response.status_code}] {response.url}')
+
+        tree = Selector(response.text)
         return Dict.name_link(tree,XPATH_TO_CITIES)
-    # else:
-        logger.error(f'{req.status_code}')
+
+    except AssertionError:
+        logger.exception(f'{response.status_code} {response.url}')
+    
 
 
 def get_lines(city: str) -> dict:
     # city = '/hokkaido/'
-    req = requests.get(LINK_TO_LINES.format(city))
-    if req.status_code == 200:
-        tree = Selector(req.text)
+    response = requests.get(LINK_TO_LINES.format(city))
+    try:
+        assert response.status_code == 200
+
+        logger.debug(f'[code:{response.status_code}] {response.url}')
+
+        tree = Selector(response.text)
         return Dict.name_link(tree,XPATH_TO_LINES)
+
+    except AssertionError:
+        logger.exception(f'{response.status_code} {response.url}')
 
 
 def get_stations(line: str) -> dict:
     # line = 'hokkaido/chitose-line'
-    req = requests.get(urljoin(DOMAIN, line))
+    response = requests.get(urljoin(DOMAIN, line))
+    try:
+        assert response.status_code == 200
 
-    if req.status_code == 200:
-        tree = Selector(req.text)
+        logger.debug(f'[code:{response.status_code}] {response.url}')
+
+        tree = Selector(response.text)
         return Dict.name_link(tree,XPATH_TO_STATIONS)
+
+    except AssertionError:
+        logger.exception(f'{response.status_code} {response.url}')
 
 
 def extract_station(station: str) -> list:
     station = Text.extract_station(station)
     # "/hokkaido/chitose_00078-st/list" -> "chitose_00078"
 
-    req = requests.get(JSON_BY_STATION.format(station))
-    if req.status_code == 200:
-        response = json.loads(req.text)
+    response = requests.get(JSON_BY_STATION.format(station))
+    try:
+        assert response.status_code == 200
+
+        logger.debug(f'[code:{response.status_code}] {response.url}')
+        
+        response = json.loads(response.text)
         return get_rooms_info(response)
+
+    except AssertionError:
+        logger.exception(f'{response.status_code} {response.url}')
 
 
 

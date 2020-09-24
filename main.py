@@ -1,7 +1,6 @@
 from good_monthly import good_monthly
 from monthly_homes import monthly_homes
 
-
 def get_city_rows():
     gm = good_monthly.get_cities()
     mh = monthly_homes.get_cities()
@@ -22,5 +21,6 @@ def get_lines_rows(id:int):
     pass
 
     
-for x, y in get_city_rows().items():
-    print(x, y)
+# for x, y in get_city_rows().items():
+#     print(x, y)
+

@@ -1,32 +1,9 @@
 import httpx
 from httpx import Response
+import asyncio
 
 from .config import DEFAULT_RETRIES, DEFAULT_TIMEOUT, PROXIES
 from .logger import logger
-
-# class Fetcher:
-
-#     @staticmethod
-#     async def request(method,
-#                       url,
-#                       allow_status_codes: list = None,
-#                       retries: int = DEFAULT_RETRIES,
-#                       **kwargs) -> Response:
-#         proxies = kwargs.pop('proxies', PROXIES)
-#         timeout = kwargs.pop('timeout', DEFAULT_TIMEOUT)
-#         for order in range(retries + 1):
-#             try:
-#                 async with httpx.AsyncClient(proxies=proxies, verify=False, timeout=timeout) as client:
-#                     response = await client.request(method, url, **kwargs)
-#                     if allow_status_codes:
-#                         Fetcher.validate_response_status_codes(response, allow_status_codes)
-#                 return response
-#             except:
-#                 logger.exception(f'{url=}')
-
-#     @staticmethod
-#     def validate_response_status_codes(request: Response, allow_status_codes: list):
-#         assert request.status_code in allow_status_codes
 
 
 async def request(method: str,
@@ -35,16 +12,26 @@ async def request(method: str,
                      retries: int = DEFAULT_RETRIES,
                      proxies: str = PROXIES,
                      timeout: str = DEFAULT_TIMEOUT,
-                     **kwargs):
-    _status_code = None
+                     **kwargs) -> Response:
+
     for _ in range(retries + 1):
-        try:
+        
+        if proxies:
+            async with httpx.AsyncClient(verify=False, timeout=timeout) as client:
+                response = await client.request(method, url, **kwargs)
+        else:
             async with httpx.AsyncClient(proxies=proxies, verify=False, timeout=timeout) as client:
                 response = await client.request(method, url, **kwargs)
-                _status_code = response.status_code
-                assert response.status_code in allow_status_codes
-            return response
-        except:
-            logger.exception(f'{_status_code} - {url}')
+                
 
-    
+        try:
+            assert response.status_code in allow_status_codes
+            logger.debug(f'{response.status_code} - {response.url}')
+            return response
+
+        except AssertionError:
+            logger.exception(f'{response.status_code} - {response.url}')
+            asyncio.sleep(3)
+
+
+# asyncio.run(request('GET', 'https://pypi.org/project/httpx/'))

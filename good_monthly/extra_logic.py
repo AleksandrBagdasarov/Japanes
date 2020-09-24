@@ -4,6 +4,8 @@ import requests
 from parsel import Selector
 
 from .const import *
+from core.logger import logger
+
 
 class Dict:
     
@@ -51,13 +53,16 @@ class Rqst:
                 reqst(page)
 
         def reqst(page):
-            req = requests.request("POST", station, headers=HEADERS, data=PAYLOAD_PAGE.format(page))
-            if req.status_code == 200:
-                tree = Selector(req.text)
+            response = requests.request("POST", station, headers=HEADERS, data=PAYLOAD_PAGE.format(page))
+            try:
+                assert response.status_code == 200
+                tree = Selector(response.text)
                 urls = tree.xpath("//h3/a/@href").extract()
                 for url in urls:
                     links.append(urljoin(DOMAIN, url))
-            cheker(urls, page)
+                cheker(urls, page)
+            except AssertionError:
+                logger.exception(f'{response.status_code} {response.url}')
         
         links = []
         page = 1
@@ -66,9 +71,12 @@ class Rqst:
 
     @staticmethod
     def extract_card(link: str) -> list:
-        req = requests.get(link)
-        if req.status_code == 200:
-            tree = Selector(req.text)
+        response = requests.get(link)
+        tree = Selector(response.text)
+
+        try:
+            assert response.status_code == 200
+            logger.debug(f'[code:{response.status_code}] {response.url}')
             
             if tree.xpath(XPATH_TO_PRICE_INFO).extract():
                 print(link)
@@ -98,8 +106,11 @@ class Rqst:
             adress = Text.get_string(tree.xpath("//*[contains(text(), '所在地')]/following-sibling::*/text()").extract())
             construction_date = Text.get_string(tree.xpath("//dt[contains(text(), '築年月')]/following-sibling::dd/text()").extract())
 
-        return Dict.get_room_parameters(link, price, usage_fee, initial_cost, name,
-             floor_plan, area, capacity, adress, construction_date)
+            return Dict.get_room_parameters(link, price, usage_fee, initial_cost, name,
+                floor_plan, area, capacity, adress, construction_date)
+
+        except AssertionError:
+            logger.exception(f'{response.status_code} {response.url}')
 
 
 class Text:

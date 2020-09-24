@@ -1,1 +1,30 @@
-2020-09-24 15:38 - WARNING: /home/user/Documents/Japanes/core/logger.py <module> -> warn
+2020-09-24 16:41 - ERROR: /home/user/Documents/Japanes/core/fetcher.py request -> 403 - https://auto.ria.com/admin
+Traceback (most recent call last):
+  File "/home/user/Documents/Japanes/core/fetcher.py", line 28, in request
+    assert response.status_code in allow_status_codes
+AssertionError
+2020-09-24 16:41 - ERROR: /home/user/Documents/Japanes/core/fetcher.py request -> 403 - https://auto.ria.com/admin
+Traceback (most recent call last):
+  File "/home/user/Documents/Japanes/core/fetcher.py", line 28, in request
+    assert response.status_code in allow_status_codes
+AssertionError
+2020-09-24 16:41 - ERROR: /home/user/Documents/Japanes/core/fetcher.py request -> 403 - https://auto.ria.com/admin
+Traceback (most recent call last):
+  File "/home/user/Documents/Japanes/core/fetcher.py", line 28, in request
+    assert response.status_code in allow_status_codes
+AssertionError
+2020-09-24 16:41 - ERROR: /home/user/Documents/Japanes/core/fetcher.py request -> 403 - https://auto.ria.com/admin
+Traceback (most recent call last):
+  File "/home/user/Documents/Japanes/core/fetcher.py", line 28, in request
+    assert response.status_code in allow_status_codes
+AssertionError
+2020-09-24 16:41 - ERROR: /home/user/Documents/Japanes/core/fetcher.py request -> 403 - https://auto.ria.com/admin
+Traceback (most recent call last):
+  File "/home/user/Documents/Japanes/core/fetcher.py", line 28, in request
+    assert response.status_code in allow_status_codes
+AssertionError
+2020-09-24 16:41 - ERROR: /home/user/Documents/Japanes/core/fetcher.py request -> 403 - https://auto.ria.com/admin
+Traceback (most recent call last):
+  File "/home/user/Documents/Japanes/core/fetcher.py", line 28, in request
+    assert response.status_code in allow_status_codes
+AssertionError
