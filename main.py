@@ -1,5 +1,7 @@
 from good_monthly import good_monthly
 from monthly_homes import monthly_homes
+import asyncio
+
 
 def get_city_rows():
     gm = good_monthly.get_cities()
@@ -20,7 +22,12 @@ def get_lines_rows(id:int):
 
     pass
 
-    
-# for x, y in get_city_rows().items():
-#     print(x, y)
+async def test():
+    for x, y in await get_city_rows().items():
+        print(y.get('good_monthly'))
+        print(y.get('monthly_homes'))
+        print(asyncio.run(good_monthly.get_lines(y.get('good_monthly'))))
+        print(asyncio.run(monthly_homes.get_lines(y.get('monthly_homes'))))
 
+
+asyncio.run(test())

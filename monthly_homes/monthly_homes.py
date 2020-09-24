@@ -2,75 +2,47 @@ import csv
 import json
 from urllib.parse import urljoin
 
-import requests
+# import requests
 from parsel import Selector
 
 from .const import *
 from .extra_logic import *
 from core.logger import logger
+from core.fetcher import request
 
 
-
-def get_cities() -> dict: 
-    response = requests.get(DOMAIN)
-    try:
-        assert response.status_code == 200
-        
-        logger.debug(f'[code:{response.status_code}] {response.url}')
-
-        tree = Selector(response.text)
-        return Dict.name_link(tree,XPATH_TO_CITIES)
-
-    except AssertionError:
-        logger.exception(f'{response.status_code} {response.url}')
+async def get_cities() -> dict: 
+    # response = requests.get(DOMAIN)
+    response = await request('GET', DOMAIN)
+    tree = Selector(response.text)
+    return Dict.name_link(tree,XPATH_TO_CITIES)
     
 
 
-def get_lines(city: str) -> dict:
+async def get_lines(city: str) -> dict:
     # city = '/hokkaido/'
-    response = requests.get(LINK_TO_LINES.format(city))
-    try:
-        assert response.status_code == 200
-
-        logger.debug(f'[code:{response.status_code}] {response.url}')
-
-        tree = Selector(response.text)
-        return Dict.name_link(tree,XPATH_TO_LINES)
-
-    except AssertionError:
-        logger.exception(f'{response.status_code} {response.url}')
+    logger.debug(f'expected: "/hokkaido/" got: {city}')
+    # response = requests.get(LINK_TO_LINES.format(city))
+    response = await request('GET', LINK_TO_LINES.format(city))
+    tree = Selector(response.text)
+    return Dict.name_link(tree,XPATH_TO_LINES)
 
 
-def get_stations(line: str) -> dict:
+async def get_stations(line: str) -> dict:
     # line = 'hokkaido/chitose-line'
-    response = requests.get(urljoin(DOMAIN, line))
-    try:
-        assert response.status_code == 200
-
-        logger.debug(f'[code:{response.status_code}] {response.url}')
-
-        tree = Selector(response.text)
-        return Dict.name_link(tree,XPATH_TO_STATIONS)
-
-    except AssertionError:
-        logger.exception(f'{response.status_code} {response.url}')
+    logger.debug(f'expected: "hokkaido/chitose-line" got: {line}')
+    # response = requests.get(urljoin(DOMAIN, line))
+    response = await request('GET', urljoin(DOMAIN, line))    
+    tree = Selector(response.text)
+    return Dict.name_link(tree,XPATH_TO_STATIONS)
 
 
-def extract_station(station: str) -> list:
-    station = Text.extract_station(station)
-    # "/hokkaido/chitose_00078-st/list" -> "chitose_00078"
-
-    response = requests.get(JSON_BY_STATION.format(station))
-    try:
-        assert response.status_code == 200
-
-        logger.debug(f'[code:{response.status_code}] {response.url}')
-        
-        response = json.loads(response.text)
-        return get_rooms_info(response)
-
-    except AssertionError:
-        logger.exception(f'{response.status_code} {response.url}')
+async def extract_station(station: str) -> list:
+    # station = "/hokkaido/chitose_00078-st/list"
+    logger.debug(f'expected: "/hokkaido/chitose_00078-st/list" got: {station}')
+    # response = requests.get(JSON_BY_STATION.format(station))
+    response = await request('GET', JSON_BY_STATION.format(Text.extract_station(station)))
+    return get_rooms_info(json.loads(response.text))
 
 
 

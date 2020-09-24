@@ -18,7 +18,8 @@ class Text:
 
     @staticmethod
     def extract_station(link: str) -> str:
-        return link.split('/')[2].split('-')[0]
+        if link:
+            return link.split('/')[2].split('-')[0]
 
 
 def get_rooms_info(response):

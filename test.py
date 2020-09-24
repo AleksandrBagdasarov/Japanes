@@ -19,7 +19,7 @@ HEADERS = {
   'Accept-Language': 'en-US,en;q=0.9,ru;q=0.8'
 }
 
-START_URLS = ('https://www.good-monthly.com/search/list_eki.html?rosen_eki_cd=315|261')
+START_URLS = ('https://www.good-monthly.com/search/list_eki.html?rosen_eki_cd=315|261',)
 
 async def main():
     task = [request("POST", url, headers=HEADERS, data=PAYLOAD_PAGE.format(1)) for url in START_URLS]
