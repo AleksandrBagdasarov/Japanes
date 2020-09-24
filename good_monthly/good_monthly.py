@@ -1,61 +1,40 @@
 import csv
 
-import requests
+# import requests
 from parsel import Selector
 
 from .const import *
 from .extra_logic import *
 from core.logger import logger
+from core.fetcher import request
+
+async def get_cities() -> list:
+    # response = requests.get(DOMAIN)
+    response = await request('GET', DOMAIN)
+    tree = Selector(response.text)
+    return Dict.get_name_link_city(tree, XPATH_TO_CITIES)
 
 
-def get_cities() -> list:
-    response = requests.get(DOMAIN)
-    try:
-        assert response.status_code == 200
-
-        logger.debug(f'[code:{response.status_code}] {response.url}')
-
-        tree = Selector(response.text)
-        return Dict.get_name_link_city(tree, XPATH_TO_CITIES)
-
-    except AssertionError:
-        logger.exception(f'{response.status_code} {response.url}')
+async def get_lines(city: str) -> list:
+    # city = 'https://www.good-monthly.com/okinawa/search/select_line.html'    
+    logger.debug(f'expected: "https://www.good-monthly.com/okinawa/search/select_line.html" got: {city}')
+    response = await request('GET', city)
+    tree = Selector(response.text)
+    return Dict.get_name_link(tree)
 
 
-def get_lines(city: str) -> list:
-    # city = 'https://www.good-monthly.com/okinawa/search/select_line.html'
-    
-    response = requests.get(city)
-    try:
-        assert response.status_code == 200
-
-        logger.debug(f'[code:{response.status_code}] {response.url}')
-
-        tree = Selector(response.text)
-        return Dict.get_name_link(tree)
-
-    except AssertionError:
-        logger.exception(f'{response.status_code} {response.url}')
+async def get_stations(line: str) -> list:
+    # line = 'https://www.good-monthly.com/search/select_station.html?rosen_cd=523'    
+    logger.debug(f'expected: "https://www.good-monthly.com/search/select_station.html?rosen_cd=523" got: {line}')
+    response = await request('GET', line)
+    tree = Selector(response.text)
+    return Dict.get_name_link(tree)
 
 
-def get_stations(line: str) -> list:
-    # line = 'https://www.good-monthly.com/search/select_station.html?rosen_cd=523'
-    
-    response = requests.get(line)
-    try:
-        assert response.status_code == 200
 
-        logger.debug(f'[code:{response.status_code}] {response.url}')
-
-        tree = Selector(response.text)
-        return Dict.get_name_link(tree)
-
-    except AssertionError:
-        logger.exception(f'{response.status_code} {response.url}')
-
-
-def extract_station(station: str) -> list:
+async def extract_station(station: str) -> list:
     # station = 'https://www.good-monthly.com/search/list_eki.html?rosen_eki_cd=483|7758'
+    logger.debug(f'expected: "https://www.good-monthly.com/search/list_eki.html?rosen_eki_cd=483|7758" got: {station}')
     return [Rqst.extract_card(link) for link in Rqst.get_cards(station)]
 
 
