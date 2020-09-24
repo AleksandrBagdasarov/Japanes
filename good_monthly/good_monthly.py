@@ -5,13 +5,13 @@ from parsel import Selector
 
 from .const import *
 from .extra_logic import *
-
-
+from core.logger import logger
 
 
 def get_cities() -> list:
     req = requests.get(DOMAIN)
     if req.status_code == 200:
+        logger.debug(f'{req.status_code} {DOMAIN}')
         tree = Selector(req.text)
         return Dict.get_name_link_city(tree, XPATH_TO_CITIES)
 

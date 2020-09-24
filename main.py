@@ -20,7 +20,7 @@ def get_city_rows():
 def get_lines_rows(id:int):
 
     pass
-    
+
     
 for x, y in get_city_rows().items():
     print(x, y)

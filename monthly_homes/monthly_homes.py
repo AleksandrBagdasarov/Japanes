@@ -7,18 +7,18 @@ from parsel import Selector
 
 from .const import *
 from .extra_logic import *
-
+from core.logger import logger
 
 
 
 def get_cities() -> dict: 
     req = requests.get(DOMAIN)
     if req.status_code == 200:
-        # logger.debug(f'get_cities(): status_code: {req.status_code} {DOMAIN}')
+        logger.debug(f'{req.status_code} {DOMAIN}')
         tree = Selector(req.text)
         return Dict.name_link(tree,XPATH_TO_CITIES)
     # else:
-    #     logger.error(f'MonthlyHomes.get_cities() status_code: {req.status_code}')
+        logger.error(f'{req.status_code}')
 
 
 def get_lines(city: str) -> dict:
