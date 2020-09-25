@@ -12,37 +12,37 @@ from core.fetcher import request
 
 
 async def get_cities() -> dict: 
-    # response = requests.get(DOMAIN)
     response = await request('GET', DOMAIN)
-    tree = Selector(response.text)
-    return Dict.name_link(tree,XPATH_TO_CITIES)
+    if response:
+        tree = Selector(response.text)
+        return Dict.name_link(tree,XPATH_TO_CITIES)
     
 
 
 async def get_lines(city: str) -> dict:
     # city = '/hokkaido/'
     logger.debug(f'expected: "/hokkaido/" got: {city}')
-    # response = requests.get(LINK_TO_LINES.format(city))
     response = await request('GET', LINK_TO_LINES.format(city))
-    tree = Selector(response.text)
-    return Dict.name_link(tree,XPATH_TO_LINES)
+    if response:
+        tree = Selector(response.text)
+        return Dict.name_link(tree,XPATH_TO_LINES)
 
 
 async def get_stations(line: str) -> dict:
     # line = 'hokkaido/chitose-line'
     logger.debug(f'expected: "hokkaido/chitose-line" got: {line}')
-    # response = requests.get(urljoin(DOMAIN, line))
-    response = await request('GET', urljoin(DOMAIN, line))    
-    tree = Selector(response.text)
-    return Dict.name_link(tree,XPATH_TO_STATIONS)
+    response = await request('GET', urljoin(DOMAIN, line))
+    if response:
+        tree = Selector(response.text)
+        return Dict.name_link(tree,XPATH_TO_STATIONS)
 
 
 async def extract_station(station: str) -> list:
     # station = "/hokkaido/chitose_00078-st/list"
     logger.debug(f'expected: "/hokkaido/chitose_00078-st/list" got: {station}')
-    # response = requests.get(JSON_BY_STATION.format(station))
     response = await request('GET', JSON_BY_STATION.format(Text.extract_station(station)))
-    return get_rooms_info(json.loads(response.text))
+    if response:
+        return get_rooms_info(json.loads(response.text))
 
 
 

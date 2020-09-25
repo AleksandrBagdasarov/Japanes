@@ -10,41 +10,37 @@ from core.fetcher import request
 import asyncio
 
 async def get_cities() -> list:
-    # response = requests.get(DOMAIN)
     response = await request('GET', DOMAIN)
-    tree = Selector(response.text)
-    return Dict.get_name_link_city(tree, XPATH_TO_CITIES)
+    if response:
+        tree = Selector(response.text)
+        return Dict.get_name_link_city(tree, XPATH_TO_CITIES)
 
 
 async def get_lines(city: str) -> list:
     # city = 'https://www.good-monthly.com/okinawa/search/select_line.html'    
     logger.debug(f'expected: "https://www.good-monthly.com/okinawa/search/select_line.html" got: {city}')
     response = await request('GET', city)
-    tree = Selector(response.text)
-    return Dict.get_name_link(tree)
+    if response:
+        tree = Selector(response.text)
+        return Dict.get_name_link(tree)
 
 
 async def get_stations(line: str) -> list:
     # line = 'https://www.good-monthly.com/search/select_station.html?rosen_cd=523'    
     logger.debug(f'expected: "https://www.good-monthly.com/search/select_station.html?rosen_cd=523" got: {line}')
     response = await request('GET', line)
-    tree = Selector(response.text)
-    return Dict.get_name_link(tree)
+    if response:
+        tree = Selector(response.text)
+        return Dict.get_name_link(tree)
 
 
 
 async def extract_station(station: str) -> list:
     # station = 'https://www.good-monthly.com/search/list_eki.html?rosen_eki_cd=483|7758'
     logger.debug(f'expected: "https://www.good-monthly.com/search/list_eki.html?rosen_eki_cd=483|7758" got: {station}')
-    links = await Rqst.get_cards(station)
-    results = []
-    # for link in links:
-    #     result = await Rqst.extract_card(link)
-    #     results.append(result)
-    task = [Rqst.extract_card(link) for link in links]
-    await asyncio.wait(task)
+    return await Rqst.get_extract_data(station)
+ 
 
-    return results
 
 
 

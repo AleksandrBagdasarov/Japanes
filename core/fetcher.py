@@ -15,7 +15,7 @@ async def request(method: str,
                      **kwargs) -> Response:
 
     for _ in range(retries + 1):
-        
+    
         if proxies:
             async with httpx.AsyncClient(verify=False, timeout=timeout) as client:
                 response = await client.request(method, url, **kwargs)

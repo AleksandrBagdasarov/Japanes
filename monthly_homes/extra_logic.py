@@ -27,6 +27,7 @@ def get_rooms_info(response):
     for r in response:
         price = r.get('price_30d')
         initial_cost = r.get('price_30d_initial_cost') - price
+        construction_date = r.get('building').get('construction_date')
 
         A.append(
             dict(
@@ -39,7 +40,7 @@ def get_rooms_info(response):
                 area = r.get('exclusive_area'),
                 capacity = r.get('capacity'),
                 adress = r.get('building').get('full_address'),
-                construction_date = r.get('building').get('construction_date')
+                construction_date = construction_date[:construction_date.find('-', 5)]
             )
         )
 

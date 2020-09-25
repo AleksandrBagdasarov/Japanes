@@ -1,6 +1,5 @@
 from urllib.parse import urljoin
 
-# import requests
 from parsel import Selector
 
 from .const import *
@@ -16,15 +15,15 @@ class Dict:
              floor_plan: str, area: str, capacity: str, adress: str, construction_date: str):
         return {
             'link': link,
-            'Price per month': price,
-            'Usage fee': usage_fee,
-            'Initial cost': initial_cost,
-            'Name of listing': name,
-            'Floor plan': floor_plan,
-            'Occupied area (size)': area,
-            'Capacity': capacity,
-            'Address': adress,
-            'Construction date': construction_date,         
+            'price': price,
+            'usage_fee': usage_fee,
+            'initial_cost': initial_cost,
+            'name': name,
+            'floor_plan': floor_plan,
+            'area': area,
+            'capacity': capacity,
+            'adress': adress,
+            'construction_date': construction_date,         
         }
 
     @staticmethod
@@ -33,7 +32,6 @@ class Dict:
         name = tree.xpath(f'{xpath}/@alt').extract()
         link = tree.xpath(f'{xpath}/parent::a/parent::li/@id').extract()
 
-        # return [{'name': n, 'link': LINK_TO_LINES.format(l)} for n, l in zip(name, link)]
         return {n: LINK_TO_LINES.format(l) for n, l in zip(name, link)}
     
     @staticmethod
@@ -49,66 +47,76 @@ class Rqst:
 
     @staticmethod
     async def get_cards(station: str) -> list:
-        # def cheker(urls, page):
-        #     if urls:
-        #         page += 1
-        #         await reqst(page)
-
         async def reqst(page):
+
             response = await request("POST", station, headers=HEADERS, data=PAYLOAD_PAGE.format(page))
-            try:
+            if response:
+
                 tree = Selector(response.text)
                 urls = tree.xpath("//h3/a/@href").extract()
                 for url in urls:
                     links.append(urljoin(DOMAIN, url))
-                # cheker(urls, page)
                 if urls:
                     page += 1
                     await reqst(page)
-            except:
-                logger.exception(f'{response.status_code} {response.url}')
         
         links = []
         page = 1        
         await reqst(page)        
         return links
 
-
     @staticmethod
-    async def extract_card(link: str) -> list:
-        response = await request('GET', link)
-        tree = Selector(response.text)
-            
-        if tree.xpath(XPATH_TO_PRICE_INFO).extract():
-            for month_price, init_cost, usg_fee in [tree.xpath(XPATH_TO_PRICE_LIST).extract()]:
-                price = Text.get_price(Text.get_string(month_price))
-                usage_fee = Text.get_price(Text.get_string(usg_fee))
-                initial_cost = Text.get_price(Text.get_string(init_cost))
+    async def get_extract_data(station: str) -> list:
+        async def extract_card(link: str) -> list:
 
-        elif tree.xpath(XPATH_TO_PRICE_INFO_2).extract():
-            for month_price, init_cost, usg_fee in [tree.xpath(XPATH_TO_PRICE_LIST_ALTERNATIVE_2).extract()]:
-                price = Text.get_price(Text.get_string(month_price))
-                usage_fee = Text.get_price(Text.get_string(usg_fee))
-                initial_cost = Text.get_price(Text.get_string(init_cost))
+            response = await request('GET', link)
+            if response:
 
-        else:
-            for month_price, init_cost, usg_fee in [tree.xpath(XPATH_TO_PRICE_LIST_ALTERNATIVE).extract()]:
-                price = Text.get_price(Text.get_string(month_price))
-                usage_fee = Text.get_price(Text.get_string(usg_fee))
-                initial_cost = Text.get_price(Text.get_string(init_cost))
+                tree = Selector(response.text)
+                    
+                if tree.xpath(XPATH_TO_PRICE_INFO).extract():
+                    for month_price, init_cost, usg_fee in [tree.xpath(XPATH_TO_PRICE_LIST).extract()]:
+                        price = Text.get_price(Text.get_string(month_price))
+                        usage_fee = Text.get_price(Text.get_string(usg_fee))
+                        initial_cost = Text.get_price(Text.get_string(init_cost))
 
-        name = Text.get_string(tree.xpath("//h2/text()").extract())
-        floor_plan = Text.get_string(tree.xpath("//dt[contains(text(), '間取り')]/following-sibling::dd/text()").extract())
-        area = Text.extract_area(tree.xpath("//dt[contains(text(), '面積')]/following-sibling::dd/text()").extract_first())
-        capacity = Text.get_digits(tree.xpath("//dt[contains(text(), '定員人数')]/following-sibling::dd/text()").extract_first())
-        adress = Text.get_string(tree.xpath("//*[contains(text(), '所在地')]/following-sibling::*/text()").extract())
-        construction_date = Text.get_string(tree.xpath("//dt[contains(text(), '築年月')]/following-sibling::dd/text()").extract())
+                elif tree.xpath(XPATH_TO_PRICE_INFO_2).extract():
+                    for month_price, init_cost, usg_fee in [tree.xpath(XPATH_TO_PRICE_LIST_ALTERNATIVE_2).extract()]:
+                        price = Text.get_price(Text.get_string(month_price))
+                        usage_fee = Text.get_price(Text.get_string(usg_fee))
+                        initial_cost = Text.get_price(Text.get_string(init_cost))
 
-        return Dict.get_room_parameters(link, price, usage_fee, initial_cost, name,
-            floor_plan, area, capacity, adress, construction_date)
+                else:
+                    for month_price, init_cost, usg_fee in [tree.xpath(XPATH_TO_PRICE_LIST_ALTERNATIVE).extract()]:
+                        price = Text.get_price(Text.get_string(month_price))
+                        usage_fee = Text.get_price(Text.get_string(usg_fee))
+                        initial_cost = Text.get_price(Text.get_string(init_cost))
 
+                name = Text.get_string(tree.xpath("//h2/text()").extract())
+                floor_plan = Text.get_string(tree.xpath("//dt[contains(text(), '間取り')]/following-sibling::dd/text()").extract())
+                area = Text.extract_area(tree.xpath("//dt[contains(text(), '面積')]/following-sibling::dd/text()").extract_first())
+                capacity = Text.get_digits(tree.xpath("//dt[contains(text(), '定員人数')]/following-sibling::dd/text()").extract_first())
+                adress = Text.get_string(tree.xpath("//*[contains(text(), '所在地')]/following-sibling::*/text()").extract())
+                construction_date = Text.get_date(tree.xpath("//dt[contains(text(), '築年月')]/following-sibling::dd/text()").extract())
+
+                extracted_data.append(Dict.get_room_parameters(link, price, usage_fee, initial_cost, name,
+                    floor_plan, area, capacity, adress, construction_date))
+
+        extracted_data = []
+        links = await Rqst.get_cards(station)
+        if links:
+            task = [extract_card(link) for link in links]
+            await asyncio.wait(task)
+
+        return extracted_data
 
 class Text:
+
+    @staticmethod
+    def get_date(some_list: list) -> str:
+        date = Text.get_string(some_list)
+        if date:
+            return date.replace('年','-').replace('月', '')
 
     @staticmethod
     def get_string(some_list: list) -> str:

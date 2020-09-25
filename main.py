@@ -53,10 +53,12 @@ def get_station_rows(line_gm: str, line_mh: str) -> dict:
 
 def get_station_data(station_gm: str, station_mh: str) -> dict:
     gm = asyncio.run(good_monthly.extract_station(station_gm))
-    # mh = asyncio.run(monthly_homes.extract_station(station_mh))
-    logger.debug(gm)
-    # for x in gm:
-    #     print(x)
+    mh = asyncio.run(monthly_homes.extract_station(station_mh))
+    
+    data = gm + mh
+    for row in data:
+        print(row)
+    return data
 
 
 get_station_data('https://www.good-monthly.com/search/list_eki.html?rosen_eki_cd=483|7758', "/hokkaido/chitose_00078-st/list")
