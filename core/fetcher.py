@@ -31,7 +31,7 @@ async def request(method: str,
 
         except AssertionError:
             logger.exception(f'{response.status_code} - {response.url}')
-            asyncio.sleep(3)
+            await asyncio.sleep(3)
 
 
 # asyncio.run(request('GET', 'https://pypi.org/project/httpx/'))
