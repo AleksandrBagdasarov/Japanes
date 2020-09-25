@@ -35,10 +35,9 @@ def get_lines_rows(city_gm: str, city_mh: str) -> dict:
     return data
 
 
-def get_station_rows(station_gm: str, station_mh: str) -> dict:
-    gm = asyncio.run(good_monthly.get_stations(station_gm))
-    mh = asyncio.run(monthly_homes.get_stations(station_mh))
-    logger.debug(mh)
+def get_station_rows(line_gm: str, line_mh: str) -> dict:
+    gm = asyncio.run(good_monthly.get_stations(line_gm))
+    mh = asyncio.run(monthly_homes.get_stations(line_mh))
 
     set_of_names = set()
     for n1, n2 in zip(gm, mh):
@@ -51,7 +50,17 @@ def get_station_rows(station_gm: str, station_mh: str) -> dict:
 
     return data
 
-for x in get_station_rows('https://www.good-monthly.com/search/select_station.html?rosen_cd=523', 'hokkaido/chitose-line'):
-    print(x)
+
+def get_station_data(station_gm: str, station_mh: str) -> dict:
+    gm = asyncio.run(good_monthly.extract_station(station_gm))
+    # mh = asyncio.run(monthly_homes.extract_station(station_mh))
+    logger.debug(gm)
+    # for x in gm:
+    #     print(x)
+
+
+get_station_data('https://www.good-monthly.com/search/list_eki.html?rosen_eki_cd=483|7758', "/hokkaido/chitose_00078-st/list")
+# for x in get_station_rows('https://www.good-monthly.com/search/select_station.html?rosen_cd=523', 'hokkaido/chitose-line'):
+#     print(x)
 # get_station_rows('https://www.good-monthly.com/search/select_station.html?rosen_cd=523', 'hokkaido/chitose-line')
 

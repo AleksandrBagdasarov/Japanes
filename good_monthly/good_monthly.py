@@ -7,6 +7,7 @@ from .const import *
 from .extra_logic import *
 from core.logger import logger
 from core.fetcher import request
+import asyncio
 
 async def get_cities() -> list:
     # response = requests.get(DOMAIN)
@@ -35,7 +36,15 @@ async def get_stations(line: str) -> list:
 async def extract_station(station: str) -> list:
     # station = 'https://www.good-monthly.com/search/list_eki.html?rosen_eki_cd=483|7758'
     logger.debug(f'expected: "https://www.good-monthly.com/search/list_eki.html?rosen_eki_cd=483|7758" got: {station}')
-    return [Rqst.extract_card(link) for link in Rqst.get_cards(station)]
+    links = await Rqst.get_cards(station)
+    results = []
+    # for link in links:
+    #     result = await Rqst.extract_card(link)
+    #     results.append(result)
+    task = [Rqst.extract_card(link) for link in links]
+    await asyncio.wait(task)
+
+    return results
 
 
 
