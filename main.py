@@ -41,7 +41,7 @@ def get_lines_rows(cities: list) -> list:
         if city_mh:
             mh = asyncio.run(monthly_homes.get_lines(city_mh))
             for name in mh:
-                set_of_names.add(name.strip('ＪＲ'))
+                set_of_names.add(name)
 
         data = []
         for name in set_of_names:
@@ -107,9 +107,8 @@ def get_station_data(stations: list) -> list:
 # for x in get_station_data([{'good_monthly': 'https://www.good-monthly.com/search/list_eki.html?rosen_eki_cd=483|7758', 'monthly_homes':''}]):
 #     print(x)
 
-# for x in get_lines_rows('https://www.good-monthly.com/okinawa/search/select_line.html', '/hokkaido/'):
+# for x in get_lines_rows([{'good_monthly':'', 'monthly_homes':'/ishikawa/'}]):
 #     print(x)
 
 # for x in get_station_rows([{'good_monthly':'https://www.good-monthly.com/search/select_station.html?rosen_cd=523', 'monthly_homes':'hokkaido/chitose-line'}, {'good_monthly':'https://www.good-monthly.com/search/select_station.html?rosen_cd=523', 'monthly_homes':'hokkaido/chitose-line'}]):
 #     print(x)
-

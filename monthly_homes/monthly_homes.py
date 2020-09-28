@@ -24,6 +24,10 @@ async def get_lines(city: str) -> dict:
     logger.debug(f'expected: "/hokkaido/" got: {city}')
     response = await request('GET', LINK_TO_LINES.format(city))
     if response:
+
+        with open('error.html', 'w') as f:
+            f.write(response.text)
+            
         tree = Selector(response.text)
         return Dict.name_link(tree,XPATH_TO_LINES)
 

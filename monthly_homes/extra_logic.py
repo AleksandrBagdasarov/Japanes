@@ -1,17 +1,23 @@
 from urllib.parse import urljoin
 
 from .const import LINK_TO_CARD
-
+from core.logger import logger
 
 class Dict:
 
     @staticmethod
     def name_link(tree, xpath):
 
-        name = tree.xpath(f'{xpath}/text()').extract()
-        link = tree.xpath(f'{xpath}/@href').extract()
+        return_data = {}
 
-        return {n: l for n, l in zip(name, link)}
+        for line in tree.xpath(f'{xpath}'):
+            return_data[line.xpath('./text()').extract_first().strip('ＪＲ')] = line.xpath('./@href').extract_first()
+
+        # name = tree.xpath(f'{xpath}/text()').extract()
+        # link = tree.xpath(f'{xpath}/@href').extract()
+
+        # return {n: l for n, l in zip(name, link)}
+        return return_data
 
 
 class Text:
